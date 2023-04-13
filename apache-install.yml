@@ -30,6 +30,10 @@
       notify:
         - Restart apache2
 
+    - name: UFW Allow Apache
+      community.general.ufw:
+        rule: allow
+        name: Apache
   handlers:
     - name: Restart apache2
       service:
