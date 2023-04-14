@@ -28,6 +28,8 @@ You will also need credentials for the following services:
 
   You will need to create a Personal Access Token with read and write access to DigitalOcean your account.
 
+  Additionally, you should create an ssh key named "terraform" in your DigitalOcean account, which will be used to access your DigitalOcean droplet. You can do this via the DigitalOcean dashboard.
+
 - FoundryVTT (https://foundryvtt.com/)
   You will need to purchase a license for FoundryVTT, where you can generate a presigned URL to download the software.
 
