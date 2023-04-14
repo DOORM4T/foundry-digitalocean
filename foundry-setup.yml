@@ -123,6 +123,10 @@
            --restart unless-stopped \
            -d \
            my-foundryvtt:10.291.0
+    # TODO: Copy & Run run-image.sh in the droplet
+    # to allow users to manually re-run the Foundry container.
+    # Also can create a new Terraform/Ansible variable for enable HTTPS; if 'yes' auto run the script in its Configure SSL condition
+    # Can also do certbot setup on the fly if 'yes' instead of setting up through Ansible all the time
 
     # TODO: Option to run without HTTPS
     #     sudo docker run \
