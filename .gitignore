@@ -3,6 +3,7 @@
 
 # Except for...
 !.gitignore
+!backup-from-droplet.sh
 !build-image.sh
 !deploy.sh
 !destroy.sh
