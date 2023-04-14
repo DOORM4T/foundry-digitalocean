@@ -3,3 +3,5 @@
 .terraform.tfstate.lock.info
 terraform.tfstate.backup
 terraform.tfstate
+run_input.txt
+destroy_input.txt

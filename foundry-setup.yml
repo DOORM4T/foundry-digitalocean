@@ -2,10 +2,26 @@
   hosts: all
   name: foundry-setup
   tasks:
-    - name: Add the user 'foundry-user' and add it to 'sudo'
+    - name: Make sure we have a 'sudo' group
+      group:
+        name: sudo
+        state: present
+
+    - name: Allow 'sudo' group to have passwordless sudo
+      lineinfile:
+        dest: /etc/sudoers
+        state: present
+        regexp: "^%sudo"
+        line: "%sudo ALL=(ALL) NOPASSWD: ALL"
+        validate: "visudo -cf %s"
+
+    - name: Add sudoers users to sudo group
       user:
         name: foundry-user
-        group: sudo
+        groups: sudo
+        append: yes
+        state: present
+        createhome: yes
 
     - name: Add SSH key to 'foundry-user'
       authorized_key:
@@ -13,9 +29,28 @@
         state: present
         key: "{{ lookup('file', pub_key) }}"
 
+    - name: apt update and install Python3
+      become: yes
+      shell: sudo apt update; sudo apt install python3 -y;
+
     - name: Wait for apt to unlock
       become: yes
       shell: while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 5; done;
+
+    # - name: Install certbot
+    #   become: yes
+    #   shell: sudo apt install certbot -y
+
+    # TODO: Certbot
+    # - name: Certbot generate SSL certificate
+    #   become: yes
+    #   shell: |
+    #     sudo certbot register  --agree-tos --register-unsafely-without-email; \
+    #     sudo certbot certonly --standalone -d '{{ subdomain_name }}.{{ domain_name }}' --non-interactive;
+
+    # - name: Wait until the certifcate files are present before continuing
+    #   ansible.builtin.wait_for:
+    #     path: /etc/letsencrypt/live/{{ subdomain_name }}.{{ domain_name }}/fullchain.pem
 
     - name: Create a foundry data directory
       ansible.builtin.file:
@@ -34,7 +69,7 @@
       ansible.builtin.shell: |
         docker run \
         -d \
-        --env FOUNDRY_RELEASE_URL='{{ foundry_timed_url}}' \
+        --env FOUNDRY_RELEASE_URL='{{ foundry_timed_url }}' \
         --publish 30000:30000/tcp \
         --volume /home/foundry-user/foundry/data:/data \
         --restart always \
