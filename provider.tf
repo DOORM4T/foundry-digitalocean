@@ -10,7 +10,6 @@ terraform {
 variable "do_token" {}
 variable "pvt_key" {}
 variable "pub_key" {}
-variable "foundry_timed_url" {}
 variable "domain_name" {} // e.g. example.com
 variable "subdomain_name" {} // e.g. www
 

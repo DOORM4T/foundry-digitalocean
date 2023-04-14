@@ -37,6 +37,10 @@
       become: yes
       shell: while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 5; done;
 
+    - name: Run self-hosted Docker registry
+      become: yes
+      shell: sudo docker run -d -p 5000:5000 --restart=always --name registry registry:2
+
     - name: UFW Allow 80/tcp for Certbot
       become: yes
       shell: sudo ufw allow 80/tcp;
@@ -68,12 +72,5 @@
     #     mode: "0644"
 
     # TODO: Run Foundry
-    # - name: Execute the command in remote shell; stdout goes to the specified file on the remote
-    #   ansible.builtin.shell: |
-    #     docker run \
-    #     -d \
-    #     --env FOUNDRY_RELEASE_URL='{{ foundry_timed_url }}' \
-    #     --publish 30000:30000/tcp \
-    #     --volume /home/foundry-user/foundry/data:/data \
-    #     --restart always \
-    #     felddy/foundryvtt:release
+    # Push FoundryVTT image to Droplet
+    # Run the image using run-image.sh

@@ -63,7 +63,7 @@ if [ "$FOUNDRY_SSL" == "y" ]; then
     --name foundryvtt \
     --restart unless-stopped \
     -d \
-    my/foundryvtt:10.291.0 \
+    my-foundryvtt:10.291.0 \
     > /dev/null
 
   echo "Foundry VTT is now starting at https://localhost:443"
@@ -76,7 +76,7 @@ else
     --name foundryvtt \
     --restart unless-stopped \
     -d \
-    my/foundryvtt:10.291.0 \
+    my-foundryvtt:10.291.0 \
     > /dev/null
 
 

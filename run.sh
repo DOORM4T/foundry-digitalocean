@@ -35,11 +35,7 @@ echo ""
 echo "Enter subdomain name (e.g. www)"
 read -p "> " SUBDOMAIN_NAME
 
-echo ""
-echo "Enter foundry timed url:"
-read -p "> " FOUNDRY_URL
-
 Run terraform
 echo "Running terraform..."
 terraform init
-terraform apply -var "do_token=${DO_PAT}" -var "pvt_key=${PVT_KEY}" -var "pub_key=${PUB_KEY}" -var "foundry_timed_url=${FOUNDRY_URL}" -var "domain_name=${DOMAIN_NAME}" -var "subdomain_name=${SUBDOMAIN_NAME}"
+terraform apply -var "do_token=${DO_PAT}" -var "pvt_key=${PVT_KEY}" -var "pub_key=${PUB_KEY}" -var "domain_name=${DOMAIN_NAME}" -var "subdomain_name=${SUBDOMAIN_NAME}"
