@@ -21,4 +21,4 @@ echo "Enter public key location:"
 read -p "> " PUB_KEY
 
 # Destroy terraform infrastructure
-terraform destroy -var "do_token=${DO_PAT}" -var "pvt_key=${PVT_KEY}"  -var "pub_key=${PUB_KEY}"
+terraform destroy -var "do_token=${DO_PAT}" -var "pvt_key=${PVT_KEY}"  -var "pub_key=${PUB_KEY}" -var "foundry_timed_url=''"
