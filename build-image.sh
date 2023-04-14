@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Enter your Foundry Timed Release URL:"
-read -p 'URL: ' FOUNDRY_RELEASE_URL
+read -p '> ' FOUNDRY_RELEASE_URL
 
 docker build \
   --build-arg FOUNDRY_RELEASE_URL=$FOUNDRY_RELEASE_URL \
