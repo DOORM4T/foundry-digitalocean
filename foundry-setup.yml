@@ -22,18 +22,20 @@
         path: /home/foundry-user/foundry/data
         state: directory
 
-    - name: Copy foundry data directory zip to foundry data directory
-      ansible.builtin.copy:
-        src: ./example-file-to-copy.txt
-        dest: /home/foundry-user/foundry/data
-        owner: foundry-user
-        mode: "0644"
+    # - name: Copy foundry data directory zip to foundry data directory
+    #   ansible.builtin.copy:
+    #     src: ./example-file-to-copy.txt
+    #     dest: /home/foundry-user/foundry/data
+    #     owner: foundry-user
+    #     mode: "0644"
 
-    # TODO: Copy docker-compose.yml
-
-    # TODO: Run the docker-compose.yml
-
-    # - name: UFW Allow Apache
-    #   community.general.ufw:
-    #     rule: allow
-    #     name: Apache
+    # TODO: Run Foundry
+    - name: Execute the command in remote shell; stdout goes to the specified file on the remote
+      ansible.builtin.shell: |
+        docker run \
+        -d \
+        --env FOUNDRY_RELEASE_URL='{{ foundry_timed_url}}' \
+        --publish 30000:30000/tcp \
+        --volume /home/foundry-user/foundry/data:/data \
+        --restart always \
+        felddy/foundryvtt:release

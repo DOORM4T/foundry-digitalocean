@@ -27,7 +27,11 @@ echo ""
 echo "Enter public key location:"
 read -p "> " PUB_KEY
 
+echo ""
+echo "Enter foundry timed url:"
+read -p "> " FOUNDRY_URL
+
 # Run terraform
 echo "Running terraform..."
 terraform init
-terraform apply -var "do_token=${DO_PAT}" -var "pvt_key=${PVT_KEY}" -var "pub_key=${PUB_KEY}"
+terraform apply -var "do_token=${DO_PAT}" -var "pvt_key=${PVT_KEY}" -var "pub_key=${PUB_KEY}" -var "foundry_timed_url=${FOUNDRY_URL}" -auto-approve
