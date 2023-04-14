@@ -4,10 +4,10 @@
 # Except for...
 !.gitignore
 !build-image.sh
+!deploy.sh
 !destroy.sh
 !droplets.tf
 !foundry-setup.yml
 !provider.tf
 !README.md
 !run-image.sh
-!run.sh

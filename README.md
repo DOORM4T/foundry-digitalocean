@@ -43,8 +43,8 @@ You will also need credentials for the following services:
 
    ```bash
     # This script will prompt you for your FoundryVTT presigned
-    # URL and build a Docker image that will be pushed to your
-    # DigitalOcean droplet by the `run.sh` script
+    # URL and build a Docker image that will be copied to your
+    # DigitalOcean droplet by the `deploy.sh` script
     $ ./build-image.sh
    ```
 
@@ -55,7 +55,7 @@ You will also need credentials for the following services:
     # to deploy your infrastructure, including your DigitalOcean
     # Personal Access Token, an optional domain name (if you have one),
     # and SSH keys.
-    $ ./run.sh
+    $ ./deploy.sh
    ```
 
 5. Once the infrastructure is deployed, you can access your FoundryVTT server at the IP address / configured domain name of your DigitalOcean droplet. You can also find this IP address via your DigitalOcean dashboard.
@@ -84,6 +84,6 @@ To destroy the infrastructure, run the following script:
  $ ./destroy.sh
 ```
 
-This will destroy the DigitalOcean droplet and all associated infrastructure, including the DigitalOcean droplet, domain name, and SSL certificates. You will need to re-run the `run.sh` script to re-deploy the infrastructure.
+This will destroy the DigitalOcean droplet and all associated infrastructure, including the DigitalOcean droplet, domain name, and SSL certificates. You will need to re-run the `deploy.sh` script to re-deploy the infrastructure.
 
 With the way DigitalOcean's billing works, you will only be charged for the time that your droplet is running, so you can save on costs by destroying the infrastructure when you are not using it.
