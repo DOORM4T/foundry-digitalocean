@@ -21,10 +21,6 @@ resource "digitalocean_droplet" "foundry_droplet" {
         private_key = file(var.pvt_key)
       }
   }
-  
-  provisioner "local-exec" {
-      command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u root -i '${self.ipv4_address},' --private-key ${var.pvt_key} -e 'pub_key=${var.pub_key} foundry_timed_url=${var.foundry_timed_url} domain_name=${var.domain_name} subdomain_name=${var.subdomain_name}' foundry-setup.yml"
-  }
 }
 
 # Assign domain name to the created droplet
@@ -37,7 +33,14 @@ resource "digitalocean_record" "A_record" {
   ttl    = 300
 }
 
+# Wait for A record to propagate and then execute Ansible playbook
+resource "null_resource" "wait_and_provision" {
+  provisioner "local-exec" {
+    command = "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -u root -i '${digitalocean_droplet.foundry_droplet[0].ipv4_address},' --private-key ${var.pvt_key} -e 'pub_key=${var.pub_key} foundry_timed_url=${var.foundry_timed_url} domain_name=${var.domain_name} subdomain_name=${var.subdomain_name}' foundry-setup.yml"
+  }
+}
 
+# Print out the IP address of the created droplet
 output "droplet_ip_addresses" {
   value = {
     for droplet in digitalocean_droplet.foundry_droplet:
