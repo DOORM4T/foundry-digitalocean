@@ -37,20 +37,23 @@
       become: yes
       shell: while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 5; done;
 
-    # - name: Install certbot
-    #   become: yes
-    #   shell: sudo apt install certbot -y
+    - name: UFW Allow 80/tcp for Certbot
+      become: yes
+      shell: sudo ufw allow 80/tcp;
 
-    # TODO: Certbot
-    # - name: Certbot generate SSL certificate
-    #   become: yes
-    #   shell: |
-    #     sudo certbot register  --agree-tos --register-unsafely-without-email; \
-    #     sudo certbot certonly --standalone -d '{{ subdomain_name }}.{{ domain_name }}' --non-interactive;
+    - name: Install certbot
+      become: yes
+      shell: sudo apt install certbot -y
 
-    # - name: Wait until the certifcate files are present before continuing
-    #   ansible.builtin.wait_for:
-    #     path: /etc/letsencrypt/live/{{ subdomain_name }}.{{ domain_name }}/fullchain.pem
+    - name: Certbot generate SSL certificate
+      become: yes
+      shell: |
+        sudo certbot register  --agree-tos --register-unsafely-without-email; \
+        sudo certbot certonly --standalone -d '{{ subdomain_name }}.{{ domain_name }}' --non-interactive;
+
+    - name: Wait until the certifcate files are present before continuing
+      ansible.builtin.wait_for:
+        path: /etc/letsencrypt/live/{{ subdomain_name }}.{{ domain_name }}/fullchain.pem
 
     - name: Create a foundry data directory
       ansible.builtin.file:
@@ -65,12 +68,12 @@
     #     mode: "0644"
 
     # TODO: Run Foundry
-    - name: Execute the command in remote shell; stdout goes to the specified file on the remote
-      ansible.builtin.shell: |
-        docker run \
-        -d \
-        --env FOUNDRY_RELEASE_URL='{{ foundry_timed_url }}' \
-        --publish 30000:30000/tcp \
-        --volume /home/foundry-user/foundry/data:/data \
-        --restart always \
-        felddy/foundryvtt:release
+    # - name: Execute the command in remote shell; stdout goes to the specified file on the remote
+    #   ansible.builtin.shell: |
+    #     docker run \
+    #     -d \
+    #     --env FOUNDRY_RELEASE_URL='{{ foundry_timed_url }}' \
+    #     --publish 30000:30000/tcp \
+    #     --volume /home/foundry-user/foundry/data:/data \
+    #     --restart always \
+    #     felddy/foundryvtt:release
