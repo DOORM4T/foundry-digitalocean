@@ -29,4 +29,4 @@ echo "Enter subdomain name (e.g. www)"
 read -p "> " SUBDOMAIN_NAME
 
 # Destroy terraform infrastructure
-terraform destroy -var "do_token=${DO_PAT}" -var "pvt_key=${PVT_KEY}"  -var "pub_key=${PUB_KEY}" -var "domain_name=${DOMAIN_NAME}" -var "subdomain_name=${SUBDOMAIN_NAME}"
+terraform destroy -var "do_token=${DO_PAT}" -var "pvt_key=${PVT_KEY}"  -var "pub_key=${PUB_KEY}" -var "domain_name=${DOMAIN_NAME}" -var "subdomain_name=${SUBDOMAIN_NAME}" -var existing_foundry_zip_data_path=""

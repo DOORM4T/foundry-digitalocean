@@ -7,11 +7,12 @@ terraform {
   }
 }
 
-variable "do_token" {}
-variable "pvt_key" {}
-variable "pub_key" {}
-variable "domain_name" {} // e.g. example.com
-variable "subdomain_name" {} // e.g. www
+variable "do_token" {} // e.g. "dop_v1_1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+variable "pvt_key" {} // e.g. "~/.ssh/foundry-digitalocean/terraform/id_rsa"
+variable "pub_key" {} // e.g. "~/.ssh/foundry-digitalocean/terraform/id_rsa.pub"
+variable "domain_name" {} // e.g. "example.com"
+variable "subdomain_name" {} // e.g. "www"
+variable "existing_foundry_zip_data_path" {} // e.g. "~/Documents/foundry/backups/foundrydata.zip containing Config/ and Data/ directories"
 
 provider "digitalocean" {
   token = var.do_token

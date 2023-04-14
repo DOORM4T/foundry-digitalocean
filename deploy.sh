@@ -35,7 +35,12 @@ echo ""
 echo "Enter subdomain name (e.g. www)"
 read -p "> " SUBDOMAIN_NAME
 
+echo ""
+echo "Enter foundrydata.zip location on your local machine (e.g. ~/Documents/foundry/backups/foundrydata.zip)"
+echo "Can be left blank if you don't have a backup to restore from."
+read -p "> " FOUNDRYDATA_ZIP
+
 Run terraform
 echo "Running terraform..."
 terraform init
-terraform apply -var "do_token=${DO_PAT}" -var "pvt_key=${PVT_KEY}" -var "pub_key=${PUB_KEY}" -var "domain_name=${DOMAIN_NAME}" -var "subdomain_name=${SUBDOMAIN_NAME}"
+terraform apply -var "do_token=${DO_PAT}" -var "pvt_key=${PVT_KEY}" -var "pub_key=${PUB_KEY}" -var "domain_name=${DOMAIN_NAME}" -var "subdomain_name=${SUBDOMAIN_NAME}" -var "existing_foundry_zip_data_path=${FOUNDRYDATA_ZIP}"
