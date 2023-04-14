@@ -123,6 +123,8 @@
            --restart unless-stopped \
            -d \
            my-foundryvtt:10.291.0
+
+    # TODO: Option to run without HTTPS
     #     sudo docker run \
     #        -e CONTAINER_CACHE='foundryvtt-10.291.zip' \
     #        -v /home/foundry-user/foundry/data:/data \
