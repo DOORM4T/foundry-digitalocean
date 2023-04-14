@@ -39,7 +39,8 @@ You will also need credentials for the following services:
 
 1. Clone this repository to your local machine.
 2. Generate a Personal Access Token with read and write access to DigitalOcean your account.
-3. Generate a FoundryVTT presigned URL through your FoundryVTT account. Note that this URL expires after 300 seconds
+3. Create an SSH key named "terraform" in your DigitalOcean account.
+4. Generate a FoundryVTT presigned URL through your FoundryVTT account. Note that this URL expires after 300 seconds
 
    Run the following script and paste the URL into the prompt:
 
@@ -50,7 +51,9 @@ You will also need credentials for the following services:
     $ ./build-image.sh
    ```
 
-4. Deploy the necessary infrastructure to DigitalOcean:
+   You won't need to run this build script again unless you want to re-create your Docker image for some reason.
+
+5. Deploy the necessary infrastructure to DigitalOcean:
 
    ```bash
     # This script will prompt you for the necessary information
@@ -60,24 +63,24 @@ You will also need credentials for the following services:
     $ ./deploy.sh
    ```
 
-5. Once the infrastructure is deployed, you can access your FoundryVTT server at the IP address / configured domain name of your DigitalOcean droplet. You can also find this IP address via your DigitalOcean dashboard.
+6. Once the infrastructure is deployed, you can access your FoundryVTT server at the IP address / configured domain name of your DigitalOcean droplet. You can also find this IP address via your DigitalOcean dashboard.
 
-6. Enjoy!
+7. Enjoy!
 
 ### Backing up your data from the DigitalOcean droplet
 
-To save your data back to your local machine, you can zip and copy the `/home/foundry-user/foundry/data` folder from your DigitalOcean droplet using tools like `scp`:
+To save your FoundryVTT data back to your local machine, you can use the `backup-from-droplet.sh` script.
 
 ```bash
- $ cd /home/foundry-user/foundry
- $ tar -czvf data.tar.gz data
- $ scp -r foundry-user@<YOUR_DIGITALOCEAN_DROPLET_IP_ADDRESS_OR_DOMAIN_NAME>:/home/foundry-user/foundry/data.tar.gz <YOUR_LOCAL_PATH>
+ $ ./backup-from-droplet.sh
 ```
+
+You can also use any other manual method to get your data (e.g. `scp`, `rsync`, etc.) if you know what you're doing. You can find your FoundryVTT data on the droplet at `/home/foundry-user/foundry/data`.
 
 ### Destroying the infrastructure
 
 ```
-⚠️ Before destroying your infrastructure, be sure to back up your FoundryVTT data to your local machine or elsewhere. ⚠️
+⚠️ Before destroying your infrastructure, be sure to back up your FoundryVTT data to your local machine or elsewhere. You have been warned! ⚠️
 ```
 
 To destroy the infrastructure, run the following script:
@@ -89,3 +92,41 @@ To destroy the infrastructure, run the following script:
 This will destroy the DigitalOcean droplet and all associated infrastructure, including the DigitalOcean droplet, domain name, and SSL certificates. You will need to re-run the `deploy.sh` script to re-deploy the infrastructure.
 
 With the way DigitalOcean's billing works, you will only be charged for the time that your droplet is running, so you can save on costs by destroying the infrastructure when you are not using it.
+
+### Additional Notes
+
+#### Faster deployment/destruction
+
+You can create input files to pass to the `deploy.sh` and `destroy.sh` scripts to speed up the process, rather than having to manually enter your information each time.
+
+For example, you can create a `deploy-input.txt` file
+
+...then use it to quickly deploy like this:
+
+```bash
+./deploy.sh < deploy-input.txt
+```
+
+Your `deploy-input.txt` may look similar to this, where each line corresponds to the input prompts from the `deploy.sh` script:
+
+Note that this will automatically deploy the infrastructure, so be sure the input file is exactly as you want it before running the script.
+
+```
+dop_v1_1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
+~/.ssh/terraform/id_rsa
+~/.ssh/terraform/id_rsa.pub
+example.com
+www
+/path/to/foundry-digitalocean/backups/foundrydata_2023-03-14_15-09-26.zip
+yes
+
+```
+
+You can do the same for the `destroy.sh` script. Note that its input prompts differ slightly from the `deploy.sh` script when creating an input file of your own for it.
+
+## What's Next?
+
+- [ ] Support for different FoundryVTT versions
+- [ ] Make SSL config optional (particularly for those who don't have a domain name)
+- [ ] Desktop GUI
+- [ ] Support for other cloud providers?
