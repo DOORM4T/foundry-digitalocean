@@ -1,7 +1,13 @@
-.terraform
-.terraform.lock.hcl
-.terraform.tfstate.lock.info
-terraform.tfstate.backup
-terraform.tfstate
-run_input.txt
-destroy_input.txt
+# Ignore everything
+*
+
+# Except for...
+!.gitignore
+!build-image.sh
+!destroy.sh
+!droplets.tf
+!foundry-setup.yml
+!provider.tf
+!README.md
+!run-image.sh
+!run.sh
