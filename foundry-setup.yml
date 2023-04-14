@@ -1,0 +1,39 @@
+- become: yes
+  hosts: all
+  name: foundry-setup
+  tasks:
+    - name: Add the user 'foundry-user' and add it to 'sudo'
+      user:
+        name: foundry-user
+        group: sudo
+
+    - name: Add SSH key to 'foundry-user'
+      authorized_key:
+        user: foundry-user
+        state: present
+        key: "{{ lookup('file', pub_key) }}"
+
+    - name: Wait for apt to unlock
+      become: yes
+      shell: while sudo fuser /var/lib/dpkg/lock >/dev/null 2>&1; do sleep 5; done;
+
+    - name: Create a foundry data directory
+      ansible.builtin.file:
+        path: /home/foundry-user/foundry/data
+        state: directory
+
+    - name: Copy foundry data directory zip to foundry data directory
+      ansible.builtin.copy:
+        src: ./example-file-to-copy.txt
+        dest: /home/foundry-user/foundry/data
+        owner: foundry-user
+        mode: "0644"
+
+    # TODO: Copy docker-compose.yml
+
+    # TODO: Run the docker-compose.yml
+
+    # - name: UFW Allow Apache
+    #   community.general.ufw:
+    #     rule: allow
+    #     name: Apache
