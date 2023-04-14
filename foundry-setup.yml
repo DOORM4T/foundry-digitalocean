@@ -71,6 +71,18 @@
         unzip -d /home/foundry-user/foundry/data "/home/foundry-user/foundry/$data_zip_basename";
       when: existing_foundry_zip_data_path is defined
 
+    - name: Copy custom Foundry Docker image tar.gz file to remote
+      ansible.builtin.copy:
+        src: ./my-image.tar.gz
+        dest: /home/foundry-user/foundry/
+        owner: foundry-user
+        mode: "0644"
+
+    - name: Load custom Foundry Docker image from the uploaded tar.gz file
+      become: yes
+      shell: |
+        sudo docker load -i /home/foundry-user/foundry/my-image.tar.gz
+
     - name: Install certbot
       become: yes
       shell: sudo apt install certbot -y
@@ -97,18 +109,6 @@
       become: yes
       shell: |
         chmod a+r /home/foundry-user/foundry/data/Config/*.pem
-
-    - name: Copy custom Foundry Docker image tar.gz file to remote
-      ansible.builtin.copy:
-        src: ./my-image.tar.gz
-        dest: /home/foundry-user/foundry/
-        owner: foundry-user
-        mode: "0644"
-
-    - name: Load custom Foundry Docker image from the uploaded tar.gz file
-      become: yes
-      shell: |
-        sudo docker load -i /home/foundry-user/foundry/my-image.tar.gz
 
     - name: Run Foundry
       become: yes
