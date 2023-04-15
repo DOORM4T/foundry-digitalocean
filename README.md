@@ -1,10 +1,32 @@
-# FOUNDRY DIGITALOCEAN
+# FOUNDRY-DIGITALOCEAN
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-_Automate the deployment of a Foundry VTT server to a DigitalOcean droplet, so you can focus on running your games (and save on costs by only running your droplet when you need it)._
+_Automate the deployment of your self-hosted FoundryVTT server to a DigitalOcean droplet, so you can focus on running your games -- and save on costs by only running your droplet when you need it._
 
-_Disclaimer: This project is not affiliated with Foundry VTT or DigitalOcean._
+## Before You Begin
+
+This project is not affiliated with FoundryVTT or DigitalOcean.
+
+Note that this project is a work in progress, though it is currently functional. You may encounter bugs. Please report them if you do! And if you'd like to contribute, feel free to open a pull request.
+
+This project is intended for those who are comfortable with the command line. If you are not comfortable with the command line, you may want to wait until a desktop GUI is available.
+
+You should have a license for FoundryVTT, which you can purchase at https://foundryvtt.com. You will need it to generate a presigned URL that will be used to build your own Docker image that will be deployed to your DigitalOcean droplet.
+
+You will also need a DigitalOcean account with billing enabled. Be sure to keep an eye on your DigitalOcean dashboard & billing details to avoid any unexpected charges.
+
+Finally, this you'll need a domain name you can use for your FoundryVTT server, which is necessary for setting up SSL certificates/HTTPS. Non-domain name support may be added in the future.
+
+## Features
+
+This project contains a set of scripts to...
+
+- Build a Docker image of FoundryVTT using your FoundryVTT presigned URL download
+  (Based on https://github.com/felddy/foundryvtt-docker#pre-installed-distribution-builds)
+- Deploy a FoundryVTT server to a DigitalOcean droplet with your own domain name and HTTPS.
+- Back up your latest FoundryVTT data from the DigitalOcean droplet to your local machine.
+- Destroy the infrastructure when you're done using it, so you only pay for the time you use it.
 
 ## Prerequisites
 
@@ -31,6 +53,7 @@ You will also need credentials for the following services:
   Additionally, you should create an ssh key named "terraform" in your DigitalOcean account, which will be used to access your DigitalOcean droplet. You can do this via the DigitalOcean dashboard.
 
 - FoundryVTT (https://foundryvtt.com/)
+
   You will need to purchase a license for FoundryVTT, where you can generate a presigned URL to download the software.
 
 ## Usage
@@ -75,7 +98,9 @@ To save your FoundryVTT data back to your local machine, you can use the `backup
  $ ./backup-from-droplet.sh
 ```
 
-You can also use any other manual method to get your data (e.g. `scp`, `rsync`, etc.) if you know what you're doing. You can find your FoundryVTT data on the droplet at `/home/foundry-user/foundry/data`.
+You can also use any other manual method to get your data (e.g. `scp`, `rsync`, etc). You can find your FoundryVTT data on the droplet at `/home/foundry-user/foundry/data`.
+
+Note that DigitalOcean has Droplet transfer limits, so you may want to be careful about how much data you transfer or else you may be charged per GB over the limit. Keep an eye on your DigitalOcean dashboard & billing details!
 
 ### Destroying the infrastructure
 
@@ -89,13 +114,13 @@ To destroy the infrastructure, run the following script:
  $ ./destroy.sh
 ```
 
-This will destroy the DigitalOcean droplet and all associated infrastructure, including the DigitalOcean droplet, domain name, and SSL certificates. You will need to re-run the `deploy.sh` script to re-deploy the infrastructure.
+This will destroy the DigitalOcean droplet and all associated infrastructure, including the DigitalOcean droplet, domain A record, and SSL certificates. You will need to re-run the `deploy.sh` script to re-deploy the infrastructure.
 
 With the way DigitalOcean's billing works, you will only be charged for the time that your droplet is running, so you can save on costs by destroying the infrastructure when you are not using it.
 
 ### Additional Notes
 
-#### Faster deployment/destruction
+#### Faster deployment/destruction with input files
 
 You can create input files to pass to the `deploy.sh` and `destroy.sh` scripts to speed up the process, rather than having to manually enter your information each time.
 
@@ -123,6 +148,20 @@ yes
 ```
 
 You can do the same for the `destroy.sh` script. Note that its input prompts differ slightly from the `deploy.sh` script when creating an input file of your own for it.
+
+#### Resizing your droplet
+
+You can resize your droplet via the DigitalOcean dashboard.
+
+Alternatively, you can destroy your existing infrastructure, edit `droplets.tf` to change the `size` parameter to the desired droplet size, then re-run the `deploy.sh` script.
+
+Be wary of the costs associated with different droplet sizes.
+
+#### Firewall rules
+
+You can update the firewall rules for your droplet via the DigitalOcean dashboard. The firewall name is `foundry_droplet_firewall`, and is associated with your droplet by the `FoundryVTT` tag.
+
+Alternatively, you can destroy your existing infrastructure, edit `droplets.tf` to change the `foundry_droplet_firewall` resource to the desired firewall rules, then re-run the `deploy.sh` script.
 
 ## What's Next?
 
