@@ -16,8 +16,6 @@ You should have a license for FoundryVTT, which you can purchase at https://foun
 
 You will also need a DigitalOcean account with billing enabled. Be sure to keep an eye on your DigitalOcean dashboard & billing details to avoid any unexpected charges.
 
-Finally, this you'll need a domain name you can use for your FoundryVTT server, which is necessary for setting up SSL certificates/HTTPS. Non-domain name support may be added in the future.
-
 ## Features
 
 This project contains a set of scripts to...
@@ -38,7 +36,7 @@ On your local machine, you will need the following installed:
 
 - Ansible (https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 
-  Configures the DigitalOcean droplet via `playbook.yml`, creating a `foundry-user` on the droplet, setting up SSL certificates, and running the FoundryVTT Docker image.
+  Configures the DigitalOcean droplet via `playbook.yml`, creating a `foundry-user` on the droplet and uploading necessary FoundryVTT data/related scripts.
 
 - Docker (https://docs.docker.com/get-docker/)
 
@@ -88,7 +86,28 @@ You will also need credentials for the following services:
 
 6. Once the infrastructure is deployed, you can access your FoundryVTT server at the IP address / configured domain name of your DigitalOcean droplet. You can also find this IP address via your DigitalOcean dashboard.
 
-7. Enjoy!
+7. To start FoundryVTT, you'll need to SSH into your droplet and run the `run-image.sh` script. It will prompt you for the necessary information to start FoundryVTT.
+
+   ```bash
+    $ ssh -i <path-to-ssh-key> foundry-user@<droplet-ip-address>
+
+    # /home/foundry-user
+    $ sudo ./start-foundry.sh
+   ```
+
+   When the script prompts you for a data volume bind path, you can pass `/home/foundry-user/foundry/data` -- this is the default directory where your FoundryVTT data will be stored on the droplet.
+
+   The script will ask if you want to configure SSL -- for this, your droplet needs to have a domain name and SSL certificates. Otherwise, you can skip this step and access FoundryVTT via HTTP.
+
+   To generate SSL certificates, you can run the `setup-ssl-certs.sh` script. This will generate the necessary .pem files using Certbot and automatically copy them to your foundry data `Config` directory with proper permissions for your FoundryVTT Docker container instance to use them.
+
+   ```bash
+    # While SSH'd into your droplet
+    # /home/foundry-user
+    $ sudo ./setup-ssl-certs.sh
+   ```
+
+8. Enjoy!
 
 ### Backing up your data from the DigitalOcean droplet
 
@@ -140,6 +159,7 @@ Note that this will automatically deploy the infrastructure, so be sure the inpu
 dop_v1_1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef
 ~/.ssh/terraform/id_rsa
 ~/.ssh/terraform/id_rsa.pub
+y
 example.com
 www
 /path/to/foundry-digitalocean/backups/foundrydata_2023-03-14_15-09-26.zip
@@ -163,9 +183,13 @@ You can update the firewall rules for your droplet via the DigitalOcean dashboar
 
 Alternatively, you can destroy your existing infrastructure, edit `droplets.tf` to change the `foundry_droplet_firewall` resource to the desired firewall rules, then re-run the `deploy.sh` script.
 
+### Setting up your domain name with DigitalOcean
+
+If you've purchased a domain name from some provider (e.g. Namecheap, Google Domains, etc.), you should make DigitalOcean the authoritative DNS server for your domain's records. This will allow you to manage your domain's DNS records via the DigitalOcean dashboard and create a subdomain via this project's terraform setup.
+
+See https://docs.digitalocean.com/products/networking/dns/how-to/add-domains/
+
 ## What's Next?
 
-- [ ] Support for different FoundryVTT versions
-- [ ] Make SSL config optional (particularly for those who don't have a domain name)
 - [ ] Desktop GUI
 - [ ] Support for other cloud providers?

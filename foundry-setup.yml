@@ -33,19 +33,15 @@
       become: yes
       shell: sudo apt update;
 
-    - name: Install python3
-      become: yes
-      shell: sudo apt install python3 -y;
-
     - name: Install zip & unzip
       become: yes
       shell: sudo apt install zip unzip -y;
 
-    - name: UFW Allow 80/tcp for Certbot
+    - name: UFW Allow 80/tcp for Foundry over HTTP
       become: yes
       shell: sudo ufw allow 80/tcp;
 
-    - name: UFW Allow 443/tcp for Foundry
+    - name: UFW Allow 443/tcp for Foundry over HTTPS
       become: yes
       shell: sudo ufw allow 443/tcp;
 
@@ -54,13 +50,27 @@
         path: /home/foundry-user/foundry/data/Config
         state: directory
 
+    - name: Copy run-image.sh to droplet
+      ansible.builtin.copy:
+        src: "./run-image.sh"
+        dest: /home/foundry-user
+        owner: foundry-user
+        mode: "0744"
+
+    - name: Copy setup-ssl-certs.sh to droplet
+      ansible.builtin.copy:
+        src: "./setup-ssl-certs.sh"
+        dest: /home/foundry-user
+        owner: foundry-user
+        mode: "0744"
+
     - name: Copy foundry data directory zip to foundry data directory
       ansible.builtin.copy:
         src: "{{ existing_foundry_zip_data_path }}"
         dest: /home/foundry-user/foundry
         owner: foundry-user
         mode: "0644"
-      when: existing_foundry_zip_data_path is defined
+      when: existing_foundry_zip_data_path != ""
 
     - name: unzip existing foundry zip into /home/foundry-user/foundry/data
       # Foundry .zip file should have the Config/ and Data/ directories at its root level when zipped.
@@ -69,7 +79,7 @@
       shell: |
         data_zip_basename=`basename {{ existing_foundry_zip_data_path }}`;
         unzip -d /home/foundry-user/foundry/data "/home/foundry-user/foundry/$data_zip_basename";
-      when: existing_foundry_zip_data_path is defined
+      when: existing_foundry_zip_data_path != ""
 
     - name: Copy custom Foundry Docker image tar.gz file to remote
       ansible.builtin.copy:
@@ -83,56 +93,42 @@
       shell: |
         sudo docker load -i /home/foundry-user/foundry/my-image.tar.gz
 
-    - name: Install certbot
-      become: yes
-      shell: sudo apt install certbot -y
+    # Commented out the automatic Certbot SSL certificate generation
+    # Sometimes, it just doesn't work.
+    # TODO: Fix it!
 
-    - name: Certbot generate SSL certificate
-      become: yes
-      shell: |
-        sudo certbot register  --agree-tos --register-unsafely-without-email; \
-        sudo certbot certonly --standalone -d '{{ subdomain_name }}.{{ domain_name }}' --non-interactive;
+    # - name: Certbot generate SSL certificate
+    #   become: yes
+    #   shell: |
+    #     sudo certbot register  --agree-tos --register-unsafely-without-email; \
+    #     sudo certbot certonly --standalone -d '{{ subdomain_name }}.{{ domain_name }}' --non-interactive;
 
-    - name: Wait until the SSL certificate files are present before continuing
-      ansible.builtin.wait_for:
-        path: /etc/letsencrypt/live/{{ subdomain_name }}.{{ domain_name }}/fullchain.pem
+    # - name: Wait until the SSL certificate files are present before continuing
+    #   ansible.builtin.wait_for:
+    #     path: /etc/letsencrypt/live/{{ subdomain_name }}.{{ domain_name }}/fullchain.pem
 
-    - name: Copy SSL certificate files to the Foundry data/Config directory
-      # This way, the SSL certificate files be available to the the Foundry container, which will bind /home/foundry-user/foundry/data/ to the container's /data folder
-      become: yes
-      shell: |
-        cp /etc/letsencrypt/live/{{ subdomain_name }}.{{ domain_name }}/fullchain.pem \
-           /etc/letsencrypt/live/{{ subdomain_name }}.{{ domain_name }}/privkey.pem \
-           /home/foundry-user/foundry/data/Config
+    # - name: Copy SSL certificate files to the Foundry data/Config directory
+    #   # This way, the SSL certificate files be available to the the Foundry container, which will bind /home/foundry-user/foundry/data/ to the container's /data folder
+    #   become: yes
+    #   shell: |
+    #     cp /etc/letsencrypt/live/{{ subdomain_name }}.{{ domain_name }}/fullchain.pem \
+    #        /etc/letsencrypt/live/{{ subdomain_name }}.{{ domain_name }}/privkey.pem \
+    #        /home/foundry-user/foundry/data/Config
 
-    - name: chmod a+r the SSL certificates so the Docker container can read them
-      become: yes
-      shell: |
-        chmod a+r /home/foundry-user/foundry/data/Config/*.pem
+    # - name: chmod a+r the SSL certificates so the Docker container can read them
+    #   become: yes
+    #   shell: |
+    #     chmod a+r /home/foundry-user/foundry/data/Config/*.pem
 
-    - name: Run Foundry
-      become: yes
-      shell: |
-        sudo docker run \
-           -e CONTAINER_CACHE='foundryvtt-10.291.zip' \
-           -e FOUNDRY_SSL_CERT=/data/Config/fullchain.pem \
-           -e FOUNDRY_SSL_KEY=/data/Config/privkey.pem \
-           -v /home/foundry-user/foundry/data:/data \
-           -p 443:30000 \
-           --name foundryvtt \
-           --restart unless-stopped \
-           -d \
-           my-foundryvtt:10.291.0
-    # TODO: Copy & Run run-image.sh in the droplet
-    # to allow users to manually re-run the Foundry container.
-    # Also can create a new Terraform/Ansible variable for enable HTTPS; if 'yes' auto run the script in its Configure SSL condition
-    # Can also do certbot setup on the fly if 'yes' instead of setting up through Ansible all the time
-
-    # TODO: Option to run without HTTPS
+    # - name: Run Foundry
+    #   become: yes
+    #   shell: |
     #     sudo docker run \
     #        -e CONTAINER_CACHE='foundryvtt-10.291.zip' \
+    #        -e FOUNDRY_SSL_CERT=/data/Config/fullchain.pem \
+    #        -e FOUNDRY_SSL_KEY=/data/Config/privkey.pem \
     #        -v /home/foundry-user/foundry/data:/data \
-    #        -p 80:30000 \
+    #        -p 443:30000 \
     #        --name foundryvtt \
     #        --restart unless-stopped \
     #        -d \

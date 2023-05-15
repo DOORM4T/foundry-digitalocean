@@ -69,7 +69,7 @@ resource "digitalocean_firewall" "foundry_droplet_firewall" {
   }
 }
 
-# Assign domain name to the created droplet
+# Assign domain name to the created droplet, if provided
 # Add an A record to the domain -- e.g. subdomain of www and domain of example.com -> www.example.com
 resource "digitalocean_record" "A_record" {
   domain = var.domain_name
@@ -77,6 +77,8 @@ resource "digitalocean_record" "A_record" {
   type   = "A"
   value  = digitalocean_droplet.foundry_droplet.ipv4_address
   ttl    = 300
+  # Only create the A record if assign_domain_name is "true"
+  count = tobool(var.assign_domain_name) ? 1 : 0
 }
 
 # Wait for A record to propagate and then execute Ansible playbook

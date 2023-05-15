@@ -12,3 +12,4 @@
 !provider.tf
 !README.md
 !run-image.sh
+!setup-ssl-certs.sh

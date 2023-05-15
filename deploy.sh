@@ -28,12 +28,24 @@ echo "Enter public key location:"
 read -p "> " PUB_KEY
 
 echo ""
-echo "Enter root domain name (e.g. example.com)"
-read -p "> " DOMAIN_NAME
+echo "Do you want to assign a domain name to your droplet? (y/n)"
+read -p "> " ASSIGN_DOMAIN_NAME
 
-echo ""
-echo "Enter subdomain name (e.g. www)"
-read -p "> " SUBDOMAIN_NAME
+DOMAIN_NAME=""
+SUBDOMAIN_NAME=""
+if [ "$ASSIGN_DOMAIN_NAME" == "y" ]; then
+    ASSIGN_DOMAIN_NAME="true"
+    
+    echo ""
+    echo "Enter root domain name (e.g. example.com)"
+    read -p "> " DOMAIN_NAME
+
+    echo ""
+    echo "Enter subdomain name (e.g. www)"
+    read -p "> " SUBDOMAIN_NAME
+else 
+    ASSIGN_DOMAIN_NAME="false"
+fi 
 
 echo ""
 echo "Enter foundrydata.zip location on your local machine (e.g. ~/Documents/foundry/backups/foundrydata.zip)"
@@ -43,4 +55,4 @@ read -p "> " FOUNDRYDATA_ZIP
 Run terraform
 echo "Running terraform..."
 terraform init
-terraform apply -var "do_token=${DO_PAT}" -var "pvt_key=${PVT_KEY}" -var "pub_key=${PUB_KEY}" -var "domain_name=${DOMAIN_NAME}" -var "subdomain_name=${SUBDOMAIN_NAME}" -var "existing_foundry_zip_data_path=${FOUNDRYDATA_ZIP}"
+terraform apply -var "do_token=${DO_PAT}" -var "pvt_key=${PVT_KEY}" -var "pub_key=${PUB_KEY}" -var "assign_domain_name=${ASSIGN_DOMAIN_NAME}" -var "domain_name=${DOMAIN_NAME}" -var "subdomain_name=${SUBDOMAIN_NAME}" -var "existing_foundry_zip_data_path=${FOUNDRYDATA_ZIP}"

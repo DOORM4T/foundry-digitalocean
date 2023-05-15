@@ -3,7 +3,7 @@
 echo "Enter your Foundry Timed Release URL:"
 read -p '> ' FOUNDRY_RELEASE_URL
 
-VERSION=10.291.0
+VERSION="10.291.0"
 
 docker buildx build \
   --platform linux/amd64 \

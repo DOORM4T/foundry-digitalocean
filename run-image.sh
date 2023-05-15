@@ -4,7 +4,10 @@ echo "------------------------"
 echo "FOUNDRY VTT DOCKER SETUP"
 echo "------------------------"
 
-# If foundryvtt contianer already exists, allow the user to delete it and continue setup
+VERSION="10.291.0"
+IMAGE_TAG="my-foundryvtt:$VERSION"
+
+# If foundryvtt container already exists, allow the user to delete it and continue setup
 # Otherwise, don't delete it and exit setup
 if [ "$(docker ps -q -f name=foundryvtt)" ]; then
   echo "Existing Foundry VTT container found."
@@ -25,7 +28,7 @@ fi
 
 # Continue setup...
 echo ""
-echo "Bind path to data volume (e.g. /path/to/foundrydata):"
+echo "Bind path to data volume (e.g. /home/foundry-user/foundry/data):"
 read -p '> ' FOUNDRY_DATA
 if [ -z "$FOUNDRY_DATA" ]; then
   echo "Data volume path required"
@@ -38,7 +41,8 @@ read -p '> ' FOUNDRY_SSL
 
 if [ "$FOUNDRY_SSL" == "y" ]; then
   echo "Configuring SSL:"
-  echo "Path to SSL CERT (optional) (e.g. /path/to/cert.pem):"
+  echo "Path to SSL CERT (e.g. /data/Config/fullchain.pem):"
+  echo "This should be relative to the /data volume of the Foundry container"
   read -p '> ' FOUNDRY_SSL_CERT
 
   if [ -z "$FOUNDRY_SSL_CERT" ]; then
@@ -46,7 +50,8 @@ if [ "$FOUNDRY_SSL" == "y" ]; then
     exit 1
   fi
 
-  echo "Path to SSL KEY (optional) (e.g. /path/to/key.pem):"
+  echo "Path to SSL KEY (e.g. /data/Config/privkey.pem):"
+  echo "This should be relative to the /data volume of the Foundry container"
   read -p '> ' FOUNDRY_SSL_KEY
 
   if [ -z "$FOUNDRY_SSL_KEY" ]; then
@@ -63,7 +68,7 @@ if [ "$FOUNDRY_SSL" == "y" ]; then
     --name foundryvtt \
     --restart unless-stopped \
     -d \
-    my-foundryvtt:10.291.0 \
+    $IMAGE_TAG \
     > /dev/null
 
   echo "Foundry VTT is now starting at https://localhost:443"
@@ -76,7 +81,7 @@ else
     --name foundryvtt \
     --restart unless-stopped \
     -d \
-    my-foundryvtt:10.291.0 \
+    $IMAGE_TAG \
     > /dev/null
 
 
