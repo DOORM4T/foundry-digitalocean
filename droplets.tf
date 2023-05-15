@@ -30,7 +30,7 @@ resource "digitalocean_firewall" "foundry_droplet_firewall" {
   inbound_rule {
     protocol         = "tcp"
     port_range       = "22"
-    # TODO: Limit source addresses to desired IP addresses
+    # TODO: Limit SSH source addresses to desired IP addresses
     source_addresses = [ "0.0.0.0/0", "::/0" ]
   }
 
@@ -89,7 +89,7 @@ resource "null_resource" "wait_and_provision" {
 }
 
 # Print out the IP address of the created droplet
-output "droplet_ip_addresse" {
+output "droplet_ip_address" {
   value = digitalocean_droplet.foundry_droplet.ipv4_address
 }
 
