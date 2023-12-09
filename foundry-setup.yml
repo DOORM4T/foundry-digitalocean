@@ -33,6 +33,20 @@
       become: yes
       shell: sudo apt update;
 
+    - name: wait until apt lock is released
+      shell: lsof -w /var/lib/apt/lists/lock | wc -l
+      register: lock
+      until: lock.stdout == "0"
+      retries: 10
+      delay: 10
+
+    - name: wait until apt lock_frontend is released
+      shell: lsof -w /var/lib/dpkg/lock-frontend | wc -l
+      register: lock_frontend
+      until: lock_frontend.stdout == "0"
+      retries: 10
+      delay: 10
+
     - name: Install zip & unzip
       become: yes
       shell: sudo apt install zip unzip -y;
